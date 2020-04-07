@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 
 CONTAINER_NAME ?= csgo-dedicated-server 
-IMAGE_NAME ?= kmallea/csgo:latest
+IMAGE_NAME ?= mvlm/csgo:latest
 SERVER_HOSTNAME ?= Counter-Strike: Global Offensive Dedicated Server
 SERVER_PASSWORD ?=
 RCON_PASSWORD ?= changeme

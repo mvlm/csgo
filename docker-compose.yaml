@@ -3,19 +3,25 @@ version: "3.7"
 volumes:
   csgo-data:
     name: csgo-data
+  mysql-data:
+    name: mysql-data
+  www-storage:
+    name: www-storage
 
 services:
   csgo:
-    image: kmallea/csgo:latest
+    build:
+      context: .
+    image: mvlm/levels-ranks-web:latest
     container_name: csgo-ds
 
     environment:
-      SERVER_HOSTNAME: "Counter-Strike: Global Offensive Dedicated Server"
+      SERVER_HOSTNAME:
       SERVER_PASSWORD:
-      RCON_PASSWORD: changeme
-      STEAM_ACCOUNT: changeme
-      AUTHKEY: changeme
-      SOURCEMOD_ADMINS: comma,delimited,list,of,steam,ids
+      RCON_PASSWORD:
+      STEAM_ACCOUNT:
+      AUTHKEY:
+      SOURCEMOD_ADMINS:
       IP: 0.0.0.0
       PORT: 27015
       TV_PORT: 27020
@@ -25,18 +31,79 @@ services:
       GAME_MODE: 1
       MAP: de_dust2
       MAPGROUP: mg_active
-      MAXPLAYERS: 12
+      MAXPLAYERS: 10
       TV_ENABLE: 1
       LAN: 0
       RETAKES: 0
+      MYSQL_USER: "csgo"
+      MYSQL_PASSWORD:
+      MYSQL_DATABASE: "csgo"
+      FAST_DOWNLOAD_URL:
+      ALLOW_FAST_DOWNLOAD:
 
     volumes:
       - type: volume
         source: csgo-data
         target: /home/steam/csgo
 
-    network_mode: "host"
+    ports:
+      - 27005:27005/udp
+      - 27015:27015/tcp
+      - 27015:27015/udp
+      - 27020:27020/udp
 
     restart: unless-stopped
     stdin_open: true
     tty: true
+
+    logging:
+      driver: json-file
+      options:
+        max-file: '5'
+        max-size: 20m
+
+  mysql:
+    image: mysql:5.7.29
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_USER: "csgo"
+      MYSQL_PASSWORD:
+      MYSQL_DATABASE: "csgo"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  nginx:
+    image: mvlm/levels-ranks-web:nginx-latest
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: www-storage
+        target: /var/www/html/storage
+        volume:
+          nocopy: true
+    ports:
+      - 80:80
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  php:
+    image: mvlm/levels-ranks-web:php-latest
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: www-storage
+        target: /var/www/html/storage
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"

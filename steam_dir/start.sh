@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # These envvars should've been set by the Dockerfile
 # If they're not set then something went wrong during the build
 : "${STEAM_DIR:?'ERROR: STEAM_DIR IS NOT SET!'}"
@@ -37,6 +39,8 @@ hostname "$SERVER_HOSTNAME"
 rcon_password "$RCON_PASSWORD"
 sv_password "$SERVER_PASSWORD"
 sv_cheats 0
+sv_downloadurl "$FAST_DOWNLOAD_URL"
+sv_allowdownload ${ALLOW_FAST_DOWNLOAD:-0}
 exec banned_user.cfg
 exec banned_ip.cfg
 AUTOEXECCFG
@@ -61,6 +65,12 @@ SERVERCFG
 
 # Install and configure plugins & extensions
 "$BASH" "$STEAM_DIR/manage_plugins.sh"
+
+# Update csgo dir
+rsync -r "$STEAM_DIR/csgo_sync/" "$CSGO_DIR/"
+
+# Make configs from templates
+find "$STEAM_DIR/csgo_templates" -type f -exec sh -c 'FILE=$(echo {} | sed "s|$STEAM_DIR/csgo_templates/||"); ( echo "cat <<EOF"; cat "$STEAM_DIR/csgo_templates/$FILE"; echo "EOF" ) | sh > "$STEAM_DIR/csgo/$FILE"' \;
 
 # Start the server
 exec "$BASH" "$CSGO_DIR/srcds_run" \

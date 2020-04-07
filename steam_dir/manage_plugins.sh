@@ -78,6 +78,7 @@ echo "Finished installing plugins."
 
 # Add steam ids to sourcemod admin file
 mkdir -p "$CSGO_DIR/csgo/addons/sourcemod/configs"
+> "$CSGO_DIR/csgo/addons/sourcemod/configs/admins_simple.ini"
 IFS=',' read -ra STEAMIDS <<< "$SOURCEMOD_ADMINS"
 for id in "${STEAMIDS[@]}"; do
     echo "\"$id\" \"99:z\"" >> "$CSGO_DIR/csgo/addons/sourcemod/configs/admins_simple.ini"

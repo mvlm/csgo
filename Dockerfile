@@ -21,6 +21,10 @@ RUN set -xo pipefail \
           locales \
           curl \
           unzip \
+          lib32z1 \
+          nano \
+          mc \
+          rsync \
       && locale-gen en_US.UTF-8 \
       && adduser --disabled-password --gecos "" steam \
       && mkdir ${STEAMCMD_DIR} \
@@ -44,7 +48,9 @@ ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8
 
-COPY --chown=steam:steam containerfs ${STEAM_DIR}/
+COPY --chown=steam:steam steam_dir ${STEAM_DIR}
+COPY --chown=steam:steam csgo_sync ${STEAM_DIR}/csgo_sync
+COPY --chown=steam:steam csgo_templates ${STEAM_DIR}/csgo_templates
 
 USER steam
 WORKDIR ${CSGO_DIR}

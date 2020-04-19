@@ -1,20 +1,15 @@
 version: "3.7"
 
 volumes:
-  csgo-data:
-    name: csgo-data
-  mysql-data:
-    name: mysql-data
-  www-storage:
-    name: www-storage
+  csgo-data: {}
+  mysql-data: {}
+  www-storage: {}
 
 services:
   csgo:
     build:
       context: .
-    image: mvlm/levels-ranks-web:latest
-    container_name: csgo-ds
-
+    image: mvlm/csgo:latest
     environment:
       SERVER_HOSTNAME:
       SERVER_PASSWORD:
